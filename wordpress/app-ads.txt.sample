@@ -1,0 +1,3 @@
+# ارفع هذا الملف إلى جذر نطاق موقعك باسم app-ads.txt
+# استبدل pub-XXXXXXXXXXXXXXXX بمعرّف الناشر من حساب AdMob
+google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
