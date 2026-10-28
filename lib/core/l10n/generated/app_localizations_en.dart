@@ -51,9 +51,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'The server is currently unreachable. Please try again later.';
 
   @override
-  String get errorTimeout => 'Connection timed out. Please try again.';
-
-  @override
   String get errorUnknown => 'An unexpected error occurred. Please try again.';
 
   @override
@@ -78,22 +75,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String minutesAgo(int count) {
-    return '$count minutes ago';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minutes ago',
+      one: '1 minute ago',
+    );
+    return '$_temp0';
   }
 
   @override
   String hoursAgo(int count) {
-    return '$count hours ago';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hours ago',
+      one: '1 hour ago',
+    );
+    return '$_temp0';
   }
 
   @override
   String daysAgo(int count) {
-    return '$count days ago';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days ago',
+      one: '1 day ago',
+    );
+    return '$_temp0';
   }
 
   @override
   String readingTimeMinutes(int count) {
-    return '$count min read';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count min read',
+      one: '1 min read',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -230,6 +251,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clearCacheLabel => 'Clear cached data';
 
   @override
+  String get clearCacheSubtitle =>
+      'Deletes cached images and news while keeping your bookmarks.';
+
+  @override
   String get cacheClearedMessage =>
       'Cache cleared successfully. Your bookmarks are safe.';
 
@@ -252,12 +277,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String versionLabel(String version) {
     return 'Version $version';
   }
-
-  @override
-  String get notificationsEnabled => 'Breaking news notifications enabled';
-
-  @override
-  String get notificationsDisabled => 'Breaking news notifications disabled';
 
   @override
   String get aboutTitle => 'About us & editorial board';
@@ -284,7 +303,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String articlesCount(int count) {
-    return '$count articles';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count articles',
+      one: '1 article',
+    );
+    return '$_temp0';
   }
 
   @override

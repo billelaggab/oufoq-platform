@@ -8,7 +8,9 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../../../core/l10n/l10n_extension.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../data/ad_service.dart';
 import '../../data/ad_unit_ids.dart';
+import '../../data/consent_manager.dart';
 import '../providers/ad_config_provider.dart';
 
 /// بنر متكيف مثبت أسفل الشاشات — يختفي تماماً عند أي فشل.
@@ -24,6 +26,8 @@ class _OufoqBannerAdSlotState extends ConsumerState<OufoqBannerAdSlot> {
   AnchoredAdaptiveBannerAdSize? _adSize;
   bool _visible = false;
   bool _initialized = false;
+  bool _retryScheduled = false;
+  int _retryCount = 0;
 
   bool get _skip =>
       Platform.environment.containsKey('FLUTTER_TEST') || !Platform.isAndroid;
@@ -44,6 +48,11 @@ class _OufoqBannerAdSlotState extends ConsumerState<OufoqBannerAdSlot> {
     final bool adsOn = ref.read(adConfigProvider).enabled &&
         ref.read(adConfigProvider).bannerEnabled;
     if (!adsOn || AdUnitIds.banner.isEmpty) {
+      return;
+    }
+    // لا نحاول التحميل قبل اكتمال تهيئة SDK والتحقق من الموافقة.
+    await AdService.initialize();
+    if (!AdService.isReady || !await ConsentManager.canRequestAds()) {
       return;
     }
     final List<ConnectivityResult> connectivity =
@@ -74,11 +83,27 @@ class _OufoqBannerAdSlotState extends ConsumerState<OufoqBannerAdSlot> {
           if (mounted) {
             setState(() => _visible = false);
           }
+          _scheduleRetry();
         },
       ),
     );
     _bannerAd = ad;
     await ad.load();
+  }
+
+  /// إعادة محاولة محدودة بدل ترك المساحة فارغة بعد فشل عابر.
+  void _scheduleRetry() {
+    if (_retryScheduled || _retryCount >= 2 || !mounted) {
+      return;
+    }
+    _retryScheduled = true;
+    _retryCount++;
+    Future<void>.delayed(const Duration(seconds: 3), () {
+      _retryScheduled = false;
+      if (mounted && !_visible) {
+        _initialize();
+      }
+    });
   }
 
   @override

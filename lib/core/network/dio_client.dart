@@ -5,12 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/app_constants.dart';
 import '../config/env_config.dart';
 import '../l10n/locale_provider.dart';
+import 'file_cache_store.dart';
 import 'interceptors/language_interceptor.dart';
 import 'interceptors/retry_interceptor.dart';
 
-/// مخزن الكاش المشترك (يُستخدم أيضاً عند مسح الكاش من الإعدادات).
+/// مخزن الكاش المشترك الدائم (يُستخدم أيضاً عند مسح الكاش من الإعدادات).
 final Provider<CacheStore> cacheStoreProvider = Provider<CacheStore>(
-  (Ref ref) => MemCacheStore(),
+  (Ref ref) => FileCacheStore(),
 );
 
 /// عميل Dio مهيأ مع الكاش واللغة وإعادة المحاولة.

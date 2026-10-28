@@ -69,21 +69,6 @@ class AdConfigLite {
   final int nativeInterval;
 }
 
-/// مؤشر تحميل المزيد أسفل القائمة.
-class LoadMoreFooter extends StatelessWidget {
-  const LoadMoreFooter({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const SliverToBoxAdapter(
-      child: Padding(
-        padding: EdgeInsetsDirectional.all(20),
-        child: Center(child: CircularProgressIndicator.adaptive()),
-      ),
-    );
-  }
-}
-
 /// عنوان قسم "أحدث الأخبار".
 class LatestNewsHeader extends StatelessWidget {
   const LatestNewsHeader({super.key});

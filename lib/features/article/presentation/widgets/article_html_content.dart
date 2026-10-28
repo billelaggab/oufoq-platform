@@ -4,7 +4,6 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:fwfh_cached_network_image/fwfh_cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../screens/full_screen_image_viewer.dart';
 
@@ -87,6 +86,3 @@ class ArticleHtmlContent extends ConsumerWidget {
   }
 }
 
-/// لون هادئ مشتق من الثيم للاقتباسات.
-Color quoteSurface(BuildContext context) =>
-    AppTheme.customOf(context).adSurface;

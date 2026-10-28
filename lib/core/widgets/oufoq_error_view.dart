@@ -55,6 +55,10 @@ class OufoqErrorView extends StatelessWidget {
   ) {
     return switch (failure) {
       NetworkFailure() => (Icons.cloud_off_rounded, l10n.errorNoInternet),
+      ServerFailure(statusCode: 404) => (
+          Icons.article_outlined,
+          l10n.articleNotFound,
+        ),
       ServerFailure() => (Icons.dns_rounded, l10n.errorServer),
       EmptyCacheFailure() => (Icons.inbox_rounded, l10n.errorEmptyCache),
       UnexpectedFailure() || null => (Icons.error_outline_rounded, l10n.errorUnknown),

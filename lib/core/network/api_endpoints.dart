@@ -12,13 +12,13 @@ abstract final class ApiEndpoints {
   static String postById(int id) => '$_base/posts/$id';
   static String get categories => '$_base/categories';
 
-  /// حقول المقالات المقلصة لتوفير 65% من حجم البيانات.
-  static const String postFields =
-      'id,date,date_gmt,modified,slug,link,title,excerpt,content,categories,tags,featured_media,_links,_embedded,oufoq_featured_image';
-
   /// حقول قائمة المقالات المضغوطة للقوائم.
+  ///
+  /// لا يتضمن `content` لتقليل حجم الاستجابة؛ شاشة المقال تجلبه بالكامل
+  /// عند الفتح عبر [postById].
   static const String postListFields =
-      'id,date,modified,slug,link,title,excerpt,categories,featured_media,_links,_embedded,oufoq_featured_image';
+      'id,date,date_gmt,modified,modified_gmt,slug,link,title,excerpt,categories,'
+      'featured_media,_links,_embedded,oufoq_featured_image';
 
   static const String categoryFields =
       'id,count,description,name,slug,parent';

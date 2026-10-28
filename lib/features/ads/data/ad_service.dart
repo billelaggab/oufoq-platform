@@ -9,12 +9,24 @@ import 'consent_manager.dart';
 class AdService {
   AdService._();
 
-  static bool _initialized = false;
+  static bool _started = false;
+  static bool _ready = false;
+  static Future<void>? _initialization;
 
-  static Future<void> initialize() async {
-    if (_initialized) {
+  /// هل اكتملت تهيئة MobileAds بنجاح؟ وحدات الإعلانات تنتظر هذه القيمة
+  /// قبل محاولة التحميل لتفادي فشل «SDK not initialized».
+  static bool get isReady => _ready;
+
+  /// تهيئة واحدة مشتركة؛ كل مستدعٍ ينتظر نفس العملية بدل تكرارها.
+  static Future<void> initialize() {
+    return _initialization ??= _initialize();
+  }
+
+  static Future<void> _initialize() async {
+    if (_started) {
       return;
     }
+    _started = true;
     if (Platform.environment.containsKey('FLUTTER_TEST') ||
         !Platform.isAndroid) {
       return;
@@ -26,7 +38,7 @@ class AdService {
         return;
       }
       await MobileAds.instance.initialize();
-      _initialized = true;
+      _ready = true;
     } on Object catch (error) {
       // لا يُسقط التطبيق أبداً بسبب فشل تهيئة الإعلانات.
       debugPrint('AdMob initialization failed: $error');

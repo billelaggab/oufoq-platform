@@ -144,21 +144,30 @@ class _BookmarkButton extends ConsumerWidget {
   }
 
   Future<void> _onToggle(BuildContext context, WidgetRef ref) async {
-    final bool nowSaved =
-        await ref.read(bookmarksNotifierProvider.notifier).toggle(article);
-    if (!context.mounted) {
-      return;
-    }
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            nowSaved
-                ? context.l10n.bookmarkAdded
-                : context.l10n.bookmarkRemoved,
+    try {
+      final bool nowSaved =
+          await ref.read(bookmarksNotifierProvider.notifier).toggle(article);
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              nowSaved
+                  ? context.l10n.bookmarkAdded
+                  : context.l10n.bookmarkRemoved,
+            ),
           ),
-        ),
-      );
+        );
+    } on Object {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(context.l10n.errorUnknown)));
+    }
   }
 }

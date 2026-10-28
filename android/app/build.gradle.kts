@@ -1,18 +1,57 @@
 import java.util.Properties
 import java.io.FileInputStream
+import org.gradle.api.GradleException
+
+// نضيف إضافة Firebase إلى classpath فقط عند وجود google-services.json،
+// حتى لا تفشل نسخ التطوير أو CI التي لا تحتوي إعداد Firebase.
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        if (file("google-services.json").exists()) {
+            classpath("com.google.gms:google-services:4.4.2")
+        }
+    }
+}
 
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    // يُفعّل عند إضافة ملف google-services.json الخاص بـ Firebase FCM:
-    // id("com.google.gms.google-services")
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// يُطبَّق فقط عند وجود google-services.json.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
 }
 
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
+val hasReleaseSigning = keystorePropertiesFile.exists() &&
+    !keystoreProperties.getProperty("storeFile").isNullOrBlank() &&
+    !keystoreProperties.getProperty("keyAlias").isNullOrBlank()
+
+// معرّف AdMob للإصدار: من key.properties أو متغير البيئة.
+val releaseAdMobAppId: String? =
+    keystoreProperties.getProperty("admobAppId")
+        ?: System.getenv("ADMOB_ANDROID_APP_ID")
+
+// يُتحقق منه فقط عند بناء الإصدار، حتى لا تتعطل نسخ التطوير.
+gradle.taskGraph.whenReady {
+    val buildingRelease =
+        allTasks.any { task -> task.name.contains("Release") }
+    if (buildingRelease && releaseAdMobAppId.isNullOrBlank()) {
+        throw GradleException(
+            "ADMOB_ANDROID_APP_ID (or admobAppId in key.properties) " +
+                "is required for release builds."
+        )
+    }
 }
 
 android {
@@ -60,10 +99,10 @@ android {
             manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
         }
         getByName("release") {
-            signingConfig = if (keystorePropertiesFile.exists()) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
+            // لا نستخدم توقيع debug في الإصدار مطلقاً؛ إن غاب key.properties
+            // يبقى الإصدار غير موقّع بدل إنتاج حزمة غير قابلة للنشر.
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
             }
             isMinifyEnabled = true
             isShrinkResources = true
@@ -71,10 +110,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            manifestPlaceholders["admobAppId"] =
-                keystoreProperties.getProperty("admobAppId")
-                    ?: System.getenv("ADMOB_ANDROID_APP_ID")
-                    ?: "ca-app-pub-3940256099942544~3347511713"
+            // منع شحن معرّف AdMob التجريبي في الإصدار.
+            manifestPlaceholders["admobAppId"] = releaseAdMobAppId ?: ""
         }
     }
 }

@@ -40,10 +40,15 @@ class NewsRepositoryImpl implements NewsRepository {
   }
 
   @override
-  Future<Result<List<ArticleEntity>>> getBreakingNews({int? categoryId}) async {
+  Future<Result<List<ArticleEntity>>> getBreakingNews({
+    int? categoryId,
+    bool forceRefresh = false,
+  }) async {
     try {
-      final List<ArticleEntity> items =
-          await _remoteDataSource.fetchBreakingNews(categoryId: categoryId);
+      final List<ArticleEntity> items = await _remoteDataSource.fetchBreakingNews(
+        categoryId: categoryId,
+        forceRefresh: forceRefresh,
+      );
       return Ok<List<ArticleEntity>>(items);
     } on Object catch (error, stackTrace) {
       return Err<List<ArticleEntity>>(ErrorMapper.map(error, stackTrace));
@@ -51,10 +56,13 @@ class NewsRepositoryImpl implements NewsRepository {
   }
 
   @override
-  Future<Result<List<ArticleEntity>>> getFeaturedPosts() async {
+  Future<Result<List<ArticleEntity>>> getFeaturedPosts({
+    bool forceRefresh = false,
+  }) async {
     try {
-      final List<ArticleEntity> items =
-          await _remoteDataSource.fetchFeaturedPosts();
+      final List<ArticleEntity> items = await _remoteDataSource.fetchFeaturedPosts(
+        forceRefresh: forceRefresh,
+      );
       return Ok<List<ArticleEntity>>(items);
     } on Object catch (error, stackTrace) {
       return Err<List<ArticleEntity>>(ErrorMapper.map(error, stackTrace));

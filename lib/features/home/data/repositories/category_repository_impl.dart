@@ -15,7 +15,9 @@ class CategoryRepositoryImpl implements CategoryRepository {
   }) async {
     try {
       final List<CategoryEntity> items =
-          await _remoteDataSource.fetchCategories();
+          await _remoteDataSource.fetchCategories(
+        forceRefresh: forceRefresh,
+      );
       return Ok<List<CategoryEntity>>(items);
     } on Object catch (error, stackTrace) {
       return Err<List<CategoryEntity>>(ErrorMapper.map(error, stackTrace));

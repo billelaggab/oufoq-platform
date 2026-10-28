@@ -51,9 +51,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Le serveur est actuellement inaccessible. Veuillez réessayer plus tard.';
 
   @override
-  String get errorTimeout => 'Délai de connexion dépassé. Veuillez réessayer.';
-
-  @override
   String get errorUnknown =>
       'Une erreur inattendue s\'est produite. Veuillez réessayer.';
 
@@ -79,22 +76,46 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String minutesAgo(int count) {
-    return 'il y a $count minutes';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'il y a $count minutes',
+      one: 'il y a 1 minute',
+    );
+    return '$_temp0';
   }
 
   @override
   String hoursAgo(int count) {
-    return 'il y a $count heures';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'il y a $count heures',
+      one: 'il y a 1 heure',
+    );
+    return '$_temp0';
   }
 
   @override
   String daysAgo(int count) {
-    return 'il y a $count jours';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'il y a $count jours',
+      one: 'il y a 1 jour',
+    );
+    return '$_temp0';
   }
 
   @override
   String readingTimeMinutes(int count) {
-    return '$count min de lecture';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count min de lecture',
+      one: '1 min de lecture',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -232,6 +253,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get clearCacheLabel => 'Effacer le cache';
 
   @override
+  String get clearCacheSubtitle =>
+      'Supprime les images et actualités en cache tout en conservant vos favoris.';
+
+  @override
   String get cacheClearedMessage =>
       'Cache effacé avec succès. Vos favoris sont conservés.';
 
@@ -255,14 +280,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String versionLabel(String version) {
     return 'Version $version';
   }
-
-  @override
-  String get notificationsEnabled =>
-      'Notifications d\'actualités urgentes activées';
-
-  @override
-  String get notificationsDisabled =>
-      'Notifications d\'actualités urgentes désactivées';
 
   @override
   String get aboutTitle => 'À propos et rédaction';
@@ -289,7 +306,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String articlesCount(int count) {
-    return '$count articles';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count articles',
+      one: '1 article',
+    );
+    return '$_temp0';
   }
 
   @override

@@ -8,7 +8,9 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../../../core/l10n/l10n_extension.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../data/ad_service.dart';
 import '../../data/ad_unit_ids.dart';
+import '../../data/consent_manager.dart';
 import '../providers/ad_config_provider.dart';
 
 /// إعلان مدمج داخل قوائم الأخبار — يختفي بهدوء عند الفشل.
@@ -26,6 +28,8 @@ class _OufoqNativeAdTileState extends ConsumerState<OufoqNativeAdTile> {
   NativeAd? _nativeAd;
   bool _loaded = false;
   bool _initialized = false;
+  bool _retryScheduled = false;
+  int _retryCount = 0;
 
   bool get _skip =>
       Platform.environment.containsKey('FLUTTER_TEST') || !Platform.isAndroid;
@@ -46,6 +50,10 @@ class _OufoqNativeAdTileState extends ConsumerState<OufoqNativeAdTile> {
     final bool adsOn = ref.read(adConfigProvider).enabled &&
         ref.read(adConfigProvider).nativeEnabled;
     if (!adsOn || AdUnitIds.native.isEmpty) {
+      return;
+    }
+    await AdService.initialize();
+    if (!AdService.isReady || !await ConsentManager.canRequestAds()) {
       return;
     }
     final List<ConnectivityResult> connectivity =
@@ -72,11 +80,27 @@ class _OufoqNativeAdTileState extends ConsumerState<OufoqNativeAdTile> {
           if (mounted) {
             setState(() => _loaded = false);
           }
+          _scheduleRetry();
         },
       ),
     );
     _nativeAd = ad;
     await ad.load();
+  }
+
+  /// إعادة محاولة محدودة بدل ترك المساحة فارغة بعد فشل عابر.
+  void _scheduleRetry() {
+    if (_retryScheduled || _retryCount >= 2 || !mounted) {
+      return;
+    }
+    _retryScheduled = true;
+    _retryCount++;
+    Future<void>.delayed(const Duration(seconds: 3), () {
+      _retryScheduled = false;
+      if (mounted && !_loaded) {
+        _initialize();
+      }
+    });
   }
 
   @override

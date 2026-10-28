@@ -63,6 +63,12 @@ class _CategoryChip extends StatelessWidget {
       child: ChoiceChip(
         label: Text(label),
         selected: selected,
+        labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: selected
+                  ? Theme.of(context).colorScheme.onPrimary
+                  : Theme.of(context).colorScheme.onSurface,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            ),
         onSelected: (_) => onSelected(),
       ),
     );

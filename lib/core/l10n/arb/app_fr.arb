@@ -15,7 +15,6 @@
 
   "errorNoInternet": "Aucune connexion Internet. Vérifiez votre réseau et réessayez.",
   "errorServer": "Le serveur est actuellement inaccessible. Veuillez réessayer plus tard.",
-  "errorTimeout": "Délai de connexion dépassé. Veuillez réessayer.",
   "errorUnknown": "Une erreur inattendue s'est produite. Veuillez réessayer.",
   "errorEmptyCache": "Aucune donnée enregistrée pour le moment.",
   "errorViewTitle": "Une erreur est survenue",
@@ -25,13 +24,13 @@
   "emptyDefaultBody": "Les dernières actualités apparaîtront ici dès qu'elles seront disponibles.",
 
   "justNow": "À l'instant",
-  "minutesAgo": "il y a {count} minutes",
+  "minutesAgo": "{count, plural, one{il y a 1 minute} other{il y a {count} minutes}}",
   "@minutesAgo": { "placeholders": { "count": { "type": "int" } } },
-  "hoursAgo": "il y a {count} heures",
+  "hoursAgo": "{count, plural, one{il y a 1 heure} other{il y a {count} heures}}",
   "@hoursAgo": { "placeholders": { "count": { "type": "int" } } },
-  "daysAgo": "il y a {count} jours",
+  "daysAgo": "{count, plural, one{il y a 1 jour} other{il y a {count} jours}}",
   "@daysAgo": { "placeholders": { "count": { "type": "int" } } },
-  "readingTimeMinutes": "{count} min de lecture",
+  "readingTimeMinutes": "{count, plural, one{1 min de lecture} other{{count} min de lecture}}",
   "@readingTimeMinutes": { "placeholders": { "count": { "type": "int" } } },
 
   "breakingLabel": "Urgent",
@@ -82,6 +81,7 @@
   "breakingNotificationsLabel": "Notifications d'actualités urgentes",
   "dataSection": "Données et stockage",
   "clearCacheLabel": "Effacer le cache",
+  "clearCacheSubtitle": "Supprime les images et actualités en cache tout en conservant vos favoris.",
   "cacheClearedMessage": "Cache effacé avec succès. Vos favoris sont conservés.",
   "aboutSection": "Oufoq Platform",
   "aboutUs": "À propos et rédaction",
@@ -90,8 +90,6 @@
   "adsPrivacyOptions": "Options de confidentialité des publicités",
   "versionLabel": "Version {version}",
   "@versionLabel": { "placeholders": { "version": { "type": "String" } } },
-  "notificationsEnabled": "Notifications d'actualités urgentes activées",
-  "notificationsDisabled": "Notifications d'actualités urgentes désactivées",
 
   "aboutTitle": "À propos et rédaction",
   "aboutBody": "Oufoq Platform est une organisation de presse arabe indépendante engagée à fournir des informations précises et des reportages approfondis avec rapidité et professionnalisme, dans le respect de l'éthique journalistique et du temps du lecteur.",
@@ -101,7 +99,7 @@
   "websiteLabel": "Site web",
 
   "categoriesTitle": "Rubriques",
-  "articlesCount": "{count} articles",
+  "articlesCount": "{count, plural, one{1 article} other{{count} articles}}",
   "@articlesCount": { "placeholders": { "count": { "type": "int" } } },
 
   "notificationChannelName": "Actualités urgentes - Oufoq Platform",

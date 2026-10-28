@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import '../../../../core/storage/preferences_service.dart';
+import '../../data/ad_service.dart';
 import '../../data/ad_unit_ids.dart';
 import '../../domain/ad_config.dart';
 import 'ad_config_provider.dart';
@@ -67,7 +69,15 @@ class InterstitialAdController extends Notifier<InterstitialState> {
   InterstitialState build() {
     ref.onDispose(_disposeAd);
     _schedulePreload();
-    return const InterstitialState();
+    // استعادة آخر ظهور من التخزين حتى لا يتكرر الإعلان بعد إعادة التشغيل.
+    final int? lastShownMillis = ref
+        .read(preferencesServiceProvider)
+        .getInt(PrefKeys.interstitialAdLastShown);
+    return InterstitialState(
+      lastShownAt: lastShownMillis == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(lastShownMillis),
+    );
   }
 
   bool get _platformSupported =>
@@ -81,12 +91,24 @@ class InterstitialAdController extends Notifier<InterstitialState> {
     if (!config.enabled || !config.interstitialEnabled) {
       return;
     }
-    // تحميل غير معطِّل بعد أول إطار لعدم إبطاء إقلاع التطبيق.
-    Future<void>.delayed(Duration.zero, _loadAd);
+    // تحميل غير معطِّل بعد أول إطار لعدم إبطاء إقلاع التطبيق،
+    // مع انتظار تهيئة SDK أولاً.
+    Future<void>.delayed(Duration.zero, _ensureInitializedAndLoad);
+  }
+
+  Future<void> _ensureInitializedAndLoad() async {
+    await AdService.initialize();
+    if (!AdService.isReady) {
+      return;
+    }
+    await _loadAd();
   }
 
   Future<void> _loadAd() async {
-    if (_isLoading || _ad != null || !_platformSupported) {
+    if (_isLoading ||
+        _ad != null ||
+        !_platformSupported ||
+        !AdService.isReady) {
       return;
     }
     final String unitId = AdUnitIds.interstitial;
@@ -150,6 +172,12 @@ class InterstitialAdController extends Notifier<InterstitialState> {
       articlesRead: 0,
       lastShownAt: now,
       isLoaded: false,
+    );
+    unawaited(
+      ref.read(preferencesServiceProvider).setInt(
+            PrefKeys.interstitialAdLastShown,
+            now.millisecondsSinceEpoch,
+          ),
     );
   }
 

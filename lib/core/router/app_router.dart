@@ -3,10 +3,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/article/domain/entities/article_entity.dart';
 import '../../features/article/presentation/screens/article_screen.dart';
+import '../../features/article/presentation/screens/slug_article_screen.dart';
 import '../../features/bookmarks/presentation/screens/bookmarks_screen.dart';
 import '../../features/categories/domain/entities/category_entity.dart';
 import '../../features/categories/presentation/screens/categories_screen.dart';
 import '../../features/categories/presentation/screens/category_articles_screen.dart';
+import '../../features/categories/presentation/screens/slug_category_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/search/presentation/screens/search_screen.dart';
 import '../../features/settings/presentation/screens/about_screen.dart';
@@ -115,9 +117,13 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: RouteNames.article,
       builder: (BuildContext context, GoRouterState state) {
-        final int id =
-            int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+        final String rawId = state.pathParameters['id'] ?? '';
+        final int? id = int.tryParse(rawId);
         final Object? extra = state.extra;
+        // دعم الروابط التي تستخدم الـ slug بدل المعرّف الرقمي.
+        if (id == null || id <= 0) {
+          return SlugArticleScreen(slug: rawId);
+        }
         return ArticleScreen(
           articleId: id,
           initialArticle: extra is ArticleEntity ? extra : null,
@@ -127,9 +133,12 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: RouteNames.category,
       builder: (BuildContext context, GoRouterState state) {
-        final int id =
-            int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+        final String rawId = state.pathParameters['id'] ?? '';
+        final int? id = int.tryParse(rawId);
         final Object? extra = state.extra;
+        if (id == null || id <= 0) {
+          return SlugCategoryScreen(slug: rawId);
+        }
         return CategoryArticlesScreen(
           categoryId: id,
           category: extra is CategoryEntity ? extra : null,
@@ -150,6 +159,15 @@ final GoRouter appRouter = GoRouter(
       path: RouteNames.contact,
       builder: (BuildContext context, GoRouterState state) =>
           const ContactScreen(),
+    ),
+    // روابط ووردبريس العميقة: https://oufoq.com/<slug>
+    GoRoute(
+      path: '/:slug',
+      builder: (BuildContext context, GoRouterState state) {
+        final String slug =
+            Uri.decodeComponent(state.pathParameters['slug'] ?? '');
+        return SlugArticleScreen(slug: slug);
+      },
     ),
   ],
   errorBuilder: (BuildContext context, GoRouterState state) => Scaffold(

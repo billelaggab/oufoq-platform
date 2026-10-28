@@ -22,6 +22,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   void initState() {
     super.initState();
+    // لا نعرض نتائج جلسة بحث سابقة عند إعادة فتح الشاشة.
+    ref.read(searchNotifierProvider.notifier).reset();
     WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
   }
 
@@ -76,7 +78,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget _buildBody(BuildContext context, SearchState state) {
     // قبل بدء البحث: سجل الكلمات السابقة.
     if (!state.hasSearched) {
-      return _HistoryView(history: state.history);
+      return _HistoryView(
+        history: state.history,
+        onTermSelected: (String term) {
+          _controller.text = term;
+          _controller.selection = TextSelection.collapsed(
+            offset: term.length,
+          );
+          ref.read(searchNotifierProvider.notifier).runSearch(term);
+        },
+      );
     }
     return state.results.when(
       loading: () => const Center(child: CircularProgressIndicator.adaptive()),
@@ -103,9 +114,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 }
 
 class _HistoryView extends ConsumerWidget {
-  const _HistoryView({required this.history});
+  const _HistoryView({required this.history, required this.onTermSelected});
 
   final List<String> history;
+  final ValueChanged<String> onTermSelected;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -144,8 +156,7 @@ class _HistoryView extends ConsumerWidget {
               ActionChip(
                 label: Text(term),
                 avatar: const Icon(Icons.history_rounded, size: 16),
-                onPressed: () =>
-                    ref.read(searchNotifierProvider.notifier).runSearch(term),
+                onPressed: () => onTermSelected(term),
               ),
           ],
         ),

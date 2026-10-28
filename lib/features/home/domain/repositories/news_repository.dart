@@ -10,9 +10,14 @@ abstract interface class NewsRepository {
     bool forceRefresh = false,
   });
 
-  Future<Result<List<ArticleEntity>>> getBreakingNews({int? categoryId});
+  Future<Result<List<ArticleEntity>>> getBreakingNews({
+    int? categoryId,
+    bool forceRefresh = false,
+  });
 
-  Future<Result<List<ArticleEntity>>> getFeaturedPosts();
+  Future<Result<List<ArticleEntity>>> getFeaturedPosts({
+    bool forceRefresh = false,
+  });
 
   Future<Result<ArticleEntity>> getPostById(int id);
 

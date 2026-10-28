@@ -15,7 +15,6 @@
 
   "errorNoInternet": "No internet connection. Check your network and try again.",
   "errorServer": "The server is currently unreachable. Please try again later.",
-  "errorTimeout": "Connection timed out. Please try again.",
   "errorUnknown": "An unexpected error occurred. Please try again.",
   "errorEmptyCache": "No saved data yet.",
   "errorViewTitle": "Something went wrong",
@@ -25,13 +24,13 @@
   "emptyDefaultBody": "The latest news will appear here as soon as it is available.",
 
   "justNow": "Now",
-  "minutesAgo": "{count} minutes ago",
+  "minutesAgo": "{count, plural, one{1 minute ago} other{{count} minutes ago}}",
   "@minutesAgo": { "placeholders": { "count": { "type": "int" } } },
-  "hoursAgo": "{count} hours ago",
+  "hoursAgo": "{count, plural, one{1 hour ago} other{{count} hours ago}}",
   "@hoursAgo": { "placeholders": { "count": { "type": "int" } } },
-  "daysAgo": "{count} days ago",
+  "daysAgo": "{count, plural, one{1 day ago} other{{count} days ago}}",
   "@daysAgo": { "placeholders": { "count": { "type": "int" } } },
-  "readingTimeMinutes": "{count} min read",
+  "readingTimeMinutes": "{count, plural, one{1 min read} other{{count} min read}}",
   "@readingTimeMinutes": { "placeholders": { "count": { "type": "int" } } },
 
   "breakingLabel": "Breaking",
@@ -82,6 +81,7 @@
   "breakingNotificationsLabel": "Breaking news notifications",
   "dataSection": "Data & storage",
   "clearCacheLabel": "Clear cached data",
+  "clearCacheSubtitle": "Deletes cached images and news while keeping your bookmarks.",
   "cacheClearedMessage": "Cache cleared successfully. Your bookmarks are safe.",
   "aboutSection": "Oufoq Platform",
   "aboutUs": "About us & editorial board",
@@ -90,8 +90,6 @@
   "adsPrivacyOptions": "Ads privacy options",
   "versionLabel": "Version {version}",
   "@versionLabel": { "placeholders": { "version": { "type": "String" } } },
-  "notificationsEnabled": "Breaking news notifications enabled",
-  "notificationsDisabled": "Breaking news notifications disabled",
 
   "aboutTitle": "About us & editorial board",
   "aboutBody": "Oufoq Platform is an independent Arabic news organisation committed to delivering accurate news and in-depth reports with speed and professionalism, while respecting journalistic ethics and the reader's time.",
@@ -101,7 +99,7 @@
   "websiteLabel": "Website",
 
   "categoriesTitle": "Categories",
-  "articlesCount": "{count} articles",
+  "articlesCount": "{count, plural, one{1 article} other{{count} articles}}",
   "@articlesCount": { "placeholders": { "count": { "type": "int" } } },
 
   "notificationChannelName": "Breaking news - Oufoq Platform",

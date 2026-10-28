@@ -25,9 +25,6 @@ abstract final class LocaleConfig {
 abstract final class FeatureFlags {
   const FeatureFlags._();
 
-  /// إعلان فتح التطبيق (مطفأ افتراضياً في الإطلاق الأول).
-  static const bool appOpenAdEnabled = false;
-
   /// تفعيل مبدل اللغة (مرتبط آلياً بعدد اللغات النشطة).
   static bool get enableLanguageSwitcher => LocaleConfig.isMultiLanguageEnabled;
 }

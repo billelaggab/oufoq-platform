@@ -15,6 +15,17 @@ final articleByIdProvider =
   );
 });
 
+/// جلب مقال عبر الـ slug (روابط ووردبريس العميقة).
+final articleBySlugProvider = FutureProvider.autoDispose
+    .family<ArticleEntity, String>((Ref ref, String slug) async {
+  final Result<ArticleEntity> result =
+      await ref.watch(newsRepositoryProvider).getPostBySlug(slug);
+  return result.when(
+    onSuccess: (ArticleEntity article) => article,
+    onFailure: (AppFailure failure) => throw failure,
+  );
+});
+
 /// المقالات ذات الصلة من نفس القسم (تخفق بهدوء بدون إنترنت).
 final relatedArticlesProvider = FutureProvider.autoDispose
     .family<List<ArticleEntity>, ArticleEntity>((Ref ref, ArticleEntity article) async {

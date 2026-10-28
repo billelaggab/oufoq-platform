@@ -178,12 +178,6 @@ abstract class AppLocalizations {
   /// **'تعذّر الاتصال بالخادم حالياً. يرجى المحاولة لاحقاً.'**
   String get errorServer;
 
-  /// No description provided for @errorTimeout.
-  ///
-  /// In ar, this message translates to:
-  /// **'انتهت مهلة الاتصال. حاول مرة أخرى.'**
-  String get errorTimeout;
-
   /// No description provided for @errorUnknown.
   ///
   /// In ar, this message translates to:
@@ -229,25 +223,25 @@ abstract class AppLocalizations {
   /// No description provided for @minutesAgo.
   ///
   /// In ar, this message translates to:
-  /// **'منذ {count} دقيقة'**
+  /// **'{count, plural, zero{الآن} one{منذ دقيقة} two{منذ دقيقتين} few{منذ {count} دقائق} many{منذ {count} دقيقة} other{منذ {count} دقيقة}}'**
   String minutesAgo(int count);
 
   /// No description provided for @hoursAgo.
   ///
   /// In ar, this message translates to:
-  /// **'منذ {count} ساعة'**
+  /// **'{count, plural, zero{الآن} one{منذ ساعة} two{منذ ساعتين} few{منذ {count} ساعات} many{منذ {count} ساعة} other{منذ {count} ساعة}}'**
   String hoursAgo(int count);
 
   /// No description provided for @daysAgo.
   ///
   /// In ar, this message translates to:
-  /// **'منذ {count} يوم'**
+  /// **'{count, plural, zero{اليوم} one{منذ يوم} two{منذ يومين} few{منذ {count} أيام} many{منذ {count} يوماً} other{منذ {count} يوم}}'**
   String daysAgo(int count);
 
   /// No description provided for @readingTimeMinutes.
   ///
   /// In ar, this message translates to:
-  /// **'{count} دقائق قراءة'**
+  /// **'{count, plural, zero{أقل من دقيقة قراءة} one{دقيقة قراءة} two{دقيقتان قراءة} few{{count} دقائق قراءة} many{{count} دقيقة قراءة} other{{count} دقيقة قراءة}}'**
   String readingTimeMinutes(int count);
 
   /// No description provided for @breakingLabel.
@@ -508,6 +502,12 @@ abstract class AppLocalizations {
   /// **'مسح الذاكرة المؤقتة'**
   String get clearCacheLabel;
 
+  /// No description provided for @clearCacheSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'يحذف الصور والأخبار المخزّنة مؤقتاً، مع الإبقاء على المحفوظات.'**
+  String get clearCacheSubtitle;
+
   /// No description provided for @cacheClearedMessage.
   ///
   /// In ar, this message translates to:
@@ -549,18 +549,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الإصدار {version}'**
   String versionLabel(String version);
-
-  /// No description provided for @notificationsEnabled.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم تفعيل إشعارات الأخبار العاجلة'**
-  String get notificationsEnabled;
-
-  /// No description provided for @notificationsDisabled.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم إيقاف إشعارات الأخبار العاجلة'**
-  String get notificationsDisabled;
 
   /// No description provided for @aboutTitle.
   ///
@@ -607,7 +595,7 @@ abstract class AppLocalizations {
   /// No description provided for @articlesCount.
   ///
   /// In ar, this message translates to:
-  /// **'{count} مقال'**
+  /// **'{count, plural, zero{لا مقالات} one{مقال واحد} two{مقالان} few{{count} مقالات} many{{count} مقالاً} other{{count} مقال}}'**
   String articlesCount(int count);
 
   /// No description provided for @notificationChannelName.

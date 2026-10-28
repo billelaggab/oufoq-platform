@@ -38,16 +38,26 @@ Future<void> main() async {
 }
 
 Future<void> _bootstrapBackgroundServices(PreferencesService preferences) async {
-  // 1) تهيئة AdMob بعد موافقة UMP.
-  await AdService.initialize();
-
-  // 2) إشعارات FCM مع fallback آمن عند غياب google-services.json.
   // نصوص القناة تأتي من طبقة الترجمة (العربية هي اللغة النشطة في الإصدار 1.0).
   final AppLocalizations l10n =
       lookupAppLocalizations(const Locale('ar'));
   final PushNotificationService push = PushNotificationService.instance;
   push.onArticleTapped =
       (int postId) => appRouter.push(RouteNames.articlePath(postId));
+
+  // AdMob وFCM مستقلان: نُهيئهما بالتوازي حتى لا تؤخر مهلة موافقة UMP
+  // تهيئة الإشعارات (أو العكس).
+  await Future.wait<void>(<Future<void>>[
+    AdService.initialize(),
+    _initializeNotifications(push, l10n, preferences),
+  ]);
+}
+
+Future<void> _initializeNotifications(
+  PushNotificationService push,
+  AppLocalizations l10n,
+  PreferencesService preferences,
+) async {
   await push.initialize(
     channelName: l10n.notificationChannelName,
     channelDescription: l10n.notificationChannelDescription,

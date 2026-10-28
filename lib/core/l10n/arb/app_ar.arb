@@ -17,7 +17,6 @@
 
   "errorNoInternet": "لا يوجد اتصال بالإنترنت. تحقق من الشبكة وحاول مجدداً.",
   "errorServer": "تعذّر الاتصال بالخادم حالياً. يرجى المحاولة لاحقاً.",
-  "errorTimeout": "انتهت مهلة الاتصال. حاول مرة أخرى.",
   "errorUnknown": "حدث خطأ غير متوقع. حاول مرة أخرى.",
   "errorEmptyCache": "لا توجد بيانات محفوظة بعد.",
   "errorViewTitle": "حدث خطأ ما",
@@ -27,13 +26,13 @@
   "emptyDefaultBody": "ستظهر هنا أحدث الأخبار فور توفرها.",
 
   "justNow": "الآن",
-  "minutesAgo": "منذ {count} دقيقة",
+  "minutesAgo": "{count, plural, zero{الآن} one{منذ دقيقة} two{منذ دقيقتين} few{منذ {count} دقائق} many{منذ {count} دقيقة} other{منذ {count} دقيقة}}",
   "@minutesAgo": { "placeholders": { "count": { "type": "int" } } },
-  "hoursAgo": "منذ {count} ساعة",
+  "hoursAgo": "{count, plural, zero{الآن} one{منذ ساعة} two{منذ ساعتين} few{منذ {count} ساعات} many{منذ {count} ساعة} other{منذ {count} ساعة}}",
   "@hoursAgo": { "placeholders": { "count": { "type": "int" } } },
-  "daysAgo": "منذ {count} يوم",
+  "daysAgo": "{count, plural, zero{اليوم} one{منذ يوم} two{منذ يومين} few{منذ {count} أيام} many{منذ {count} يوماً} other{منذ {count} يوم}}",
   "@daysAgo": { "placeholders": { "count": { "type": "int" } } },
-  "readingTimeMinutes": "{count} دقائق قراءة",
+  "readingTimeMinutes": "{count, plural, zero{أقل من دقيقة قراءة} one{دقيقة قراءة} two{دقيقتان قراءة} few{{count} دقائق قراءة} many{{count} دقيقة قراءة} other{{count} دقيقة قراءة}}",
   "@readingTimeMinutes": { "placeholders": { "count": { "type": "int" } } },
 
   "breakingLabel": "عاجل",
@@ -84,6 +83,7 @@
   "breakingNotificationsLabel": "إشعارات الأخبار العاجلة",
   "dataSection": "البيانات والتخزين",
   "clearCacheLabel": "مسح الذاكرة المؤقتة",
+  "clearCacheSubtitle": "يحذف الصور والأخبار المخزّنة مؤقتاً، مع الإبقاء على المحفوظات.",
   "cacheClearedMessage": "تم مسح الذاكرة المؤقتة بنجاح، المحفوظات سليمة.",
   "aboutSection": "منصة أفق",
   "aboutUs": "من نحن وهيئة التحرير",
@@ -92,8 +92,6 @@
   "adsPrivacyOptions": "إعدادات خصوصية الإعلانات",
   "versionLabel": "الإصدار {version}",
   "@versionLabel": { "placeholders": { "version": { "type": "String" } } },
-  "notificationsEnabled": "تم تفعيل إشعارات الأخبار العاجلة",
-  "notificationsDisabled": "تم إيقاف إشعارات الأخبار العاجلة",
 
   "aboutTitle": "من نحن وهيئة التحرير",
   "aboutBody": "منصة أفق مؤسسة إخبارية عربية مستقلة تسعى لتقديم أخبار دقيقة وتقارير معمقة بسرعة ومهنية، مع الالتزام بأخلاقيات الصحافة واحترام عقل القارئ ووقته.",
@@ -103,7 +101,7 @@
   "websiteLabel": "الموقع الإلكتروني",
 
   "categoriesTitle": "الأقسام",
-  "articlesCount": "{count} مقال",
+  "articlesCount": "{count, plural, zero{لا مقالات} one{مقال واحد} two{مقالان} few{{count} مقالات} many{{count} مقالاً} other{{count} مقال}}",
   "@articlesCount": { "placeholders": { "count": { "type": "int" } } },
 
   "notificationChannelName": "الأخبار العاجلة - منصة أفق",

@@ -46,6 +46,7 @@ class NewsRemoteDataSource {
   Future<List<ArticleModel>> fetchBreakingNews({
     required int? categoryId,
     int limit = AppConstants.breakingPostsLimit,
+    bool forceRefresh = false,
   }) async {
     if (categoryId == null || categoryId <= 0) {
       return const <ArticleModel>[];
@@ -55,17 +56,18 @@ class NewsRemoteDataSource {
       queryParameters: <String, dynamic>{
         'categories': categoryId,
         'per_page': limit,
-        '_fields': 'id,date,modified,slug,link,title,excerpt,categories,'
+        '_fields': 'id,date,date_gmt,modified,slug,link,title,excerpt,categories,'
             'featured_media,_links,_embedded,oufoq_featured_image',
         '_embed': ApiEndpoints.embedArgsLite,
       },
-      options: _requestOptions(false),
+      options: _requestOptions(forceRefresh),
     );
     return _parsePosts(response.data);
   }
 
   Future<List<ArticleModel>> fetchFeaturedPosts({
     int limit = AppConstants.featuredPostsLimit,
+    bool forceRefresh = false,
   }) async {
     // محاولة جلب المقالات المثبتة (sticky) ثم الرجوع للأحدث.
     List<ArticleModel> featured = const <ArticleModel>[];
@@ -78,7 +80,7 @@ class NewsRemoteDataSource {
           '_embed': ApiEndpoints.embedArgsLite,
           '_fields': ApiEndpoints.postListFields,
         },
-        options: _requestOptions(false),
+        options: _requestOptions(forceRefresh),
       );
       featured = _parsePosts(stickyResponse.data);
     } on DioException {
@@ -94,7 +96,7 @@ class NewsRemoteDataSource {
         '_embed': ApiEndpoints.embedArgsLite,
         '_fields': ApiEndpoints.postListFields,
       },
-      options: _requestOptions(false),
+      options: _requestOptions(forceRefresh),
     );
     return _parsePosts(response.data);
   }
@@ -152,7 +154,9 @@ class NewsRemoteDataSource {
     return _parsePosts(response.data);
   }
 
-  Future<List<CategoryEntity>> fetchCategories() async {
+  Future<List<CategoryEntity>> fetchCategories({
+    bool forceRefresh = false,
+  }) async {
     final Response<dynamic> response = await _dio.get<dynamic>(
       ApiEndpoints.categories,
       queryParameters: <String, dynamic>{
@@ -162,7 +166,7 @@ class NewsRemoteDataSource {
         'order': 'desc',
         '_fields': ApiEndpoints.categoryFields,
       },
-      options: _requestOptions(false),
+      options: _requestOptions(forceRefresh),
     );
     if (response.data is! List) {
       return const <CategoryEntity>[];

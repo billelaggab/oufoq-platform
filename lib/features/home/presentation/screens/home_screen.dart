@@ -73,6 +73,11 @@ class _HomeContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return NotificationListener<ScrollNotification>(
       onNotification: (ScrollNotification notification) {
+        // التمرير الأفقي لشريط الأقسام ليس تمريراً لقائمة الأخبار.
+        if (notification.depth != 0 ||
+            notification.metrics.axis != Axis.vertical) {
+          return false;
+        }
         final double maxScroll = notification.metrics.maxScrollExtent;
         final double current = notification.metrics.pixels;
         if (maxScroll - current <= 300) {

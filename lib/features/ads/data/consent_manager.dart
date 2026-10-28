@@ -35,15 +35,23 @@ class ConsentManager {
         (FormError error) {
           debugPrint('UMP consent info error: ${error.message}');
           if (!completer.isCompleted) {
-            completer.complete(true);
+            // لا نمنح موافقة ضمنية عند فشل جلب حالة الخصوصية.
+            completer.complete(false);
           }
         },
       );
     } on Object catch (error) {
       debugPrint('UMP gatherConsent failed: $error');
-      return true;
+      return false;
     }
-    return completer.future;
+    // مهلة قصوى حتى لا تعلق سلسلة الإقلاع إن لم يصل أي callback.
+    return completer.future.timeout(
+      const Duration(seconds: 8),
+      onTimeout: () {
+        debugPrint('UMP consent timed out.');
+        return false;
+      },
+    );
   }
 
   static Future<bool> canRequestAds() async {
@@ -53,7 +61,7 @@ class ConsentManager {
     try {
       return await _information.canRequestAds();
     } on Object {
-      return true;
+      return false;
     }
   }
 

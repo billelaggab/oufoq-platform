@@ -18,7 +18,9 @@ class PushNotificationService {
 
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
-  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+
+  /// لا يُلمس قبل `Firebase.initializeApp()` وإلا رمى `no-app`.
+  FirebaseMessaging get _messaging => FirebaseMessaging.instance;
 
   bool _available = false;
   bool _initialized = false;
@@ -33,12 +35,13 @@ class PushNotificationService {
     if (_initialized) {
       return;
     }
-    _initialized = true;
     try {
       await Firebase.initializeApp();
       _available = true;
+      _initialized = true;
     } on Object catch (error) {
-      // غياب google-services.json أو أي فشل تهيئة => وضع آمن صامت.
+      // غياب google-services.json أو أي فشل تهيئة => وضع آمن صامت،
+      // مع السماح بمحاولة لاحقة إن توفر الإعداد.
       debugPrint('FCM unavailable (safe fallback): $error');
       _available = false;
       return;

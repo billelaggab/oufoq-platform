@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -27,19 +28,45 @@ class _FeaturedHeroCarouselState extends State<FeaturedHeroCarousel> {
   @override
   void initState() {
     super.initState();
-    if (widget.articles.length > 1) {
-      _autoAdvance = Timer.periodic(const Duration(seconds: 6), (_) {
-        if (!mounted || !_controller.hasClients) {
-          return;
-        }
-        final int next = (_currentPage + 1) % widget.articles.length;
-        _controller.animateToPage(
-          next,
-          duration: const Duration(milliseconds: 450),
-          curve: Curves.easeInOut,
-        );
-      });
+    _restartAutoAdvance();
+  }
+
+  @override
+  void didUpdateWidget(covariant FeaturedHeroCarousel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!listEquals(oldWidget.articles, widget.articles)) {
+      _restartAutoAdvance();
+      if (widget.articles.isEmpty || _currentPage >= widget.articles.length) {
+        _currentPage = 0;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && _controller.hasClients && widget.articles.isNotEmpty) {
+            _controller.jumpToPage(0);
+          }
+        });
+      }
     }
+  }
+
+  void _restartAutoAdvance() {
+    _autoAdvance?.cancel();
+    _autoAdvance = null;
+    if (widget.articles.length <= 1) {
+      return;
+    }
+    _autoAdvance = Timer.periodic(const Duration(seconds: 6), (_) {
+      if (!mounted || widget.articles.isEmpty || !_controller.hasClients) {
+        return;
+      }
+      if (_currentPage >= widget.articles.length) {
+        _currentPage = 0;
+      }
+      final int next = (_currentPage + 1) % widget.articles.length;
+      _controller.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeInOut,
+      );
+    });
   }
 
   @override

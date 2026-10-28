@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/error/app_failure.dart';
 import '../../../../core/l10n/l10n_extension.dart';
+import '../../../../core/router/route_names.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/oufoq_cached_image.dart';
 import '../../../../core/widgets/oufoq_error_view.dart';
@@ -44,20 +46,31 @@ class _ArticleScreenState extends ConsumerState<ArticleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.initialArticle != null) {
+    final ArticleEntity? initial = widget.initialArticle;
+    // المحتوى الكامل (رابط عميق/مقال محفوظ) لا يحتاج طلباً إضافياً.
+    if (initial != null && initial.htmlContent.trim().isNotEmpty) {
       return _ArticleScaffold(
-        article: widget.initialArticle!,
+        article: initial,
         onFirstFrame: _countArticleRead,
       );
     }
+
+    // المقالات القادمة من القوائم لا تحمل `content`، لذا نجلب النسخة
+    // الكاملة بالمعرّف بدلاً من عرض متن فارغ.
     final AsyncValue<ArticleEntity> articleAsync =
         ref.watch(articleByIdProvider(widget.articleId));
     return articleAsync.when(
-      loading: () => const _ArticleLoadingScaffold(),
+      loading: (initial == null || initial.htmlContent.trim().isEmpty)
+          ? _ArticleLoadingScaffold.new
+          : () => _ArticleScaffold(
+                article: initial,
+                onFirstFrame: _countArticleRead,
+              ),
       error: (Object error, StackTrace _) => Scaffold(
         appBar: AppBar(),
         body: OufoqErrorView(
           failure: error is AppFailure ? error : null,
+          onRetry: () => ref.invalidate(articleByIdProvider(widget.articleId)),
         ),
       ),
       data: (ArticleEntity article) => _ArticleScaffold(
@@ -112,6 +125,14 @@ class _ArticleScaffold extends ConsumerWidget {
           SliverAppBar(
             pinned: true,
             expandedHeight: article.hasFeaturedImage ? 240 : 0,
+            // فتح رابط عميق مباشرة لا يوفّر زر رجوع، فنضيف طريقاً للرئيسية.
+            leading: context.canPop()
+                ? null
+                : IconButton(
+                    tooltip: context.l10n.navHome,
+                    icon: const Icon(Icons.home_rounded),
+                    onPressed: () => context.go(RouteNames.home),
+                  ),
             actions: <Widget>[
               IconButton(
                 tooltip: context.l10n.fontScaleTitle,
@@ -208,20 +229,29 @@ class _ArticleScaffold extends ConsumerWidget {
   }
 
   Future<void> _toggleBookmark(BuildContext context, WidgetRef ref) async {
-    final bool saved =
-        await ref.read(bookmarksNotifierProvider.notifier).toggle(article);
-    if (!context.mounted) {
-      return;
-    }
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            saved ? context.l10n.bookmarkAdded : context.l10n.bookmarkRemoved,
+    try {
+      final bool saved =
+          await ref.read(bookmarksNotifierProvider.notifier).toggle(article);
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              saved ? context.l10n.bookmarkAdded : context.l10n.bookmarkRemoved,
+            ),
           ),
-        ),
-      );
+        );
+    } on Object {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(context.l10n.errorUnknown)));
+    }
   }
 
   Future<void> _shareArticle() async {

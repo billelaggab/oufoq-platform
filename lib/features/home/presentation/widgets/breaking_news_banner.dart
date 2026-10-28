@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -28,20 +29,41 @@ class _BreakingNewsBannerState extends State<BreakingNewsBanner>
   @override
   void initState() {
     super.initState();
-    // لا تُنشأ أي مؤثرات حركية عند غياب الأخبار العاجلة.
-    if (widget.articles.isEmpty) {
-      _pulseController = AnimationController(vsync: this);
-      return;
-    }
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
       lowerBound: 0.55,
       upperBound: 1,
-    )..repeat(reverse: true);
+    );
+    _syncAnimation();
+  }
+
+  @override
+  void didUpdateWidget(covariant BreakingNewsBanner oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // القائمة قد تصل بعد الإقلاع أو يتغيّر عددها بعد التحديث.
+    if (!listEquals(oldWidget.articles, widget.articles)) {
+      _syncAnimation();
+    }
+  }
+
+  void _syncAnimation() {
+    _cycleTimer?.cancel();
+    _cycleTimer = null;
+    if (widget.articles.isEmpty) {
+      _pulseController.stop();
+      _index = 0;
+      return;
+    }
+    if (_index >= widget.articles.length) {
+      _index = 0;
+    }
+    if (!_pulseController.isAnimating) {
+      _pulseController.repeat(reverse: true);
+    }
     if (widget.articles.length > 1) {
       _cycleTimer = Timer.periodic(const Duration(seconds: 4), (_) {
-        if (!mounted) {
+        if (!mounted || widget.articles.isEmpty) {
           return;
         }
         setState(() => _index = (_index + 1) % widget.articles.length);

@@ -38,12 +38,16 @@ class CategoryArticlesNotifier
     extends AsyncNotifier<CategoryArticlesState> {
   int _page = 1;
 
+  /// يبطل نتائج «تحميل المزيد» القديمة عند تبديل القسم.
+  int _requestId = 0;
+
   @override
   Future<CategoryArticlesState> build() async {
     return const CategoryArticlesState();
   }
 
   Future<void> loadCategory(int categoryId) async {
+    final int requestId = ++_requestId;
     _page = 1;
     state = const AsyncLoading<CategoryArticlesState>();
     try {
@@ -52,6 +56,9 @@ class CategoryArticlesNotifier
                 page: 1,
                 categoryId: categoryId,
               );
+      if (requestId != _requestId) {
+        return;
+      }
       switch (result) {
         case Ok<PaginatedResult<ArticleEntity>>(:final PaginatedResult<ArticleEntity> data):
           state = AsyncData<CategoryArticlesState>(
@@ -65,6 +72,9 @@ class CategoryArticlesNotifier
           state = AsyncError<CategoryArticlesState>(failure, StackTrace.current);
       }
     } on Object catch (error, stackTrace) {
+      if (requestId != _requestId) {
+        return;
+      }
       state = AsyncError<CategoryArticlesState>(
           ErrorMapper.map(error), stackTrace);
     }
@@ -78,32 +88,52 @@ class CategoryArticlesNotifier
         current.articles.isEmpty) {
       return;
     }
+    final int requestId = _requestId;
+    final int categoryId = current.categoryId;
     state = AsyncData<CategoryArticlesState>(
       current.copyWith(isLoadingMore: true),
     );
     final int nextPage = _page + 1;
-    final Result<PaginatedResult<ArticleEntity>> result =
-        await ref.read(newsRepositoryProvider).getPosts(
-              page: nextPage,
-              categoryId: current.categoryId,
-            );
-    switch (result) {
-      case Ok<PaginatedResult<ArticleEntity>>(:final PaginatedResult<ArticleEntity> data):
-        _page = nextPage;
-        state = AsyncData<CategoryArticlesState>(
-          (state.value ?? current).copyWith(
-            articles: <ArticleEntity>[...current.articles, ...data.items],
-            hasMore: data.hasMore,
-            isLoadingMore: false,
-          ),
-        );
-      case Err<dynamic>(:final AppFailure failure):
-        state = AsyncData<CategoryArticlesState>(
-          (state.value ?? current).copyWith(
-            hasMore: !ErrorMapper.isEndOfPagination(failure),
-            isLoadingMore: false,
-          ),
-        );
+    try {
+      final Result<PaginatedResult<ArticleEntity>> result =
+          await ref.read(newsRepositoryProvider).getPosts(
+                page: nextPage,
+                categoryId: categoryId,
+              );
+      // تغيّر القسم أو بدأ تحميل جديد أثناء الانتظار => تجاهل هذه النتيجة.
+      if (requestId != _requestId) {
+        return;
+      }
+      final CategoryArticlesState? latest = state.value;
+      if (latest == null || latest.categoryId != categoryId) {
+        return;
+      }
+      switch (result) {
+        case Ok<PaginatedResult<ArticleEntity>>(:final PaginatedResult<ArticleEntity> data):
+          _page = nextPage;
+          state = AsyncData<CategoryArticlesState>(
+            latest.copyWith(
+              articles: <ArticleEntity>[...latest.articles, ...data.items],
+              hasMore: data.hasMore,
+              isLoadingMore: false,
+            ),
+          );
+        case Err<dynamic>(:final AppFailure failure):
+          state = AsyncData<CategoryArticlesState>(
+            latest.copyWith(
+              hasMore: !ErrorMapper.isEndOfPagination(failure),
+              isLoadingMore: false,
+            ),
+          );
+      }
+    } on Object catch (error, stackTrace) {
+      if (requestId != _requestId) {
+        return;
+      }
+      state = AsyncError<CategoryArticlesState>(
+        ErrorMapper.map(error),
+        stackTrace,
+      );
     }
   }
 }

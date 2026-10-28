@@ -42,11 +42,14 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <!-- روابط عميقة لمقالات الموقع (Android App Links) -->
+            <!-- يجب استبدال oufoq.com بالنطاق الفعلي عبر WP_BASE_URL عند البناء،
+                 ونشر /.well-known/assetlinks.json على الموقع للتحقق. -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="https" android:host="oufoq-domain.com"/>
+                <data android:scheme="https" android:host="oufoq.com"/>
+                <data android:scheme="https" android:host="www.oufoq.com"/>
             </intent-filter>
         </activity>
 

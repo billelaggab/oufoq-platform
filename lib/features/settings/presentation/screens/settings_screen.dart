@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -14,7 +16,12 @@ import '../../../../core/router/route_names.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../ads/data/consent_manager.dart';
 import '../../../ads/presentation/providers/consent_providers.dart';
+import '../../../categories/presentation/providers/categories_providers.dart';
+import '../../../categories/presentation/providers/category_articles_notifier.dart';
+import '../../../home/presentation/providers/home_feed_notifier.dart';
+import '../../../notifications/data/push_notification_service.dart';
 import '../../../notifications/presentation/providers/notification_settings_provider.dart';
+import '../../../search/presentation/providers/search_notifier.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -224,7 +231,22 @@ class _AppearanceCard extends ConsumerWidget {
                   .where((Locale l) => l.languageCode == code)
                   .firstOrNull;
               if (match != null) {
+                final Locale previous = ref.read(localeProvider);
                 ref.read(localeProvider.notifier).setLocale(match);
+                // المحتوى المخزّن في المزوّدات يخص اللغة السابقة.
+                ref.invalidate(homeFeedNotifierProvider);
+                ref.invalidate(categoriesProvider);
+                ref.invalidate(categoryArticlesNotifierProvider);
+                ref.invalidate(searchNotifierProvider);
+                if (ref.read(notificationSettingsProvider) &&
+                    previous.languageCode != match.languageCode) {
+                  unawaited(
+                    PushNotificationService.instance.syncLanguageTopic(
+                      oldLanguageCode: previous.languageCode,
+                      newLanguageCode: match.languageCode,
+                    ),
+                  );
+                }
               }
             }
             Navigator.of(context).pop();
@@ -272,7 +294,7 @@ class _DataCard extends ConsumerWidget {
       child: ListTile(
         leading: const Icon(Icons.cleaning_services_outlined),
         title: Text(context.l10n.clearCacheLabel),
-        subtitle: Text(context.l10n.bookmarksTitle),
+        subtitle: Text(context.l10n.clearCacheSubtitle),
         trailing: const Icon(Icons.chevron_right_rounded),
         onTap: () => _clearCache(context, ref),
       ),

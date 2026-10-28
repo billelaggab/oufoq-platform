@@ -51,9 +51,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'تعذّر الاتصال بالخادم حالياً. يرجى المحاولة لاحقاً.';
 
   @override
-  String get errorTimeout => 'انتهت مهلة الاتصال. حاول مرة أخرى.';
-
-  @override
   String get errorUnknown => 'حدث خطأ غير متوقع. حاول مرة أخرى.';
 
   @override
@@ -76,22 +73,62 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String minutesAgo(int count) {
-    return 'منذ $count دقيقة';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'منذ $count دقيقة',
+      many: 'منذ $count دقيقة',
+      few: 'منذ $count دقائق',
+      two: 'منذ دقيقتين',
+      one: 'منذ دقيقة',
+      zero: 'الآن',
+    );
+    return '$_temp0';
   }
 
   @override
   String hoursAgo(int count) {
-    return 'منذ $count ساعة';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'منذ $count ساعة',
+      many: 'منذ $count ساعة',
+      few: 'منذ $count ساعات',
+      two: 'منذ ساعتين',
+      one: 'منذ ساعة',
+      zero: 'الآن',
+    );
+    return '$_temp0';
   }
 
   @override
   String daysAgo(int count) {
-    return 'منذ $count يوم';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'منذ $count يوم',
+      many: 'منذ $count يوماً',
+      few: 'منذ $count أيام',
+      two: 'منذ يومين',
+      one: 'منذ يوم',
+      zero: 'اليوم',
+    );
+    return '$_temp0';
   }
 
   @override
   String readingTimeMinutes(int count) {
-    return '$count دقائق قراءة';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count دقيقة قراءة',
+      many: '$count دقيقة قراءة',
+      few: '$count دقائق قراءة',
+      two: 'دقيقتان قراءة',
+      one: 'دقيقة قراءة',
+      zero: 'أقل من دقيقة قراءة',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -227,6 +264,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get clearCacheLabel => 'مسح الذاكرة المؤقتة';
 
   @override
+  String get clearCacheSubtitle =>
+      'يحذف الصور والأخبار المخزّنة مؤقتاً، مع الإبقاء على المحفوظات.';
+
+  @override
   String get cacheClearedMessage =>
       'تم مسح الذاكرة المؤقتة بنجاح، المحفوظات سليمة.';
 
@@ -249,12 +290,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String versionLabel(String version) {
     return 'الإصدار $version';
   }
-
-  @override
-  String get notificationsEnabled => 'تم تفعيل إشعارات الأخبار العاجلة';
-
-  @override
-  String get notificationsDisabled => 'تم إيقاف إشعارات الأخبار العاجلة';
 
   @override
   String get aboutTitle => 'من نحن وهيئة التحرير';
@@ -281,7 +316,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String articlesCount(int count) {
-    return '$count مقال';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مقال',
+      many: '$count مقالاً',
+      few: '$count مقالات',
+      two: 'مقالان',
+      one: 'مقال واحد',
+      zero: 'لا مقالات',
+    );
+    return '$_temp0';
   }
 
   @override

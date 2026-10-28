@@ -10,6 +10,9 @@ abstract final class PrefKeys {
   static const String articleFontScale = 'pref_article_font_scale';
   static const String notificationsEnabled = 'pref_notifications_enabled';
   static const String searchHistory = 'pref_search_history';
+  static const String appOpenAdLastShown = 'pref_app_open_ad_last_shown';
+  static const String interstitialAdLastShown =
+      'pref_interstitial_ad_last_shown';
 }
 
 /// غلاف نظيف حول [SharedPreferences].
@@ -36,6 +39,10 @@ class PreferencesService {
 
   Future<void> setDouble(String key, double value) =>
       _prefs.setDouble(key, value);
+
+  int? getInt(String key) => _prefs.getInt(key);
+
+  Future<void> setInt(String key, int value) => _prefs.setInt(key, value);
 
   List<String> getStringList(String key) => _prefs.getStringList(key) ?? const <String>[];
 

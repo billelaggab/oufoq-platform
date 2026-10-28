@@ -5,7 +5,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import '../../../../core/storage/preferences_service.dart';
+import '../../data/ad_service.dart';
 import '../../data/ad_unit_ids.dart';
+import '../../domain/ad_config.dart';
 import 'ad_config_provider.dart';
 
 /// إعلان فتح التطبيق عند العودة من الخلفية (مطفأ افتراضياً).
@@ -27,6 +30,13 @@ class AppOpenAdController extends Notifier<void> {
     if (!_supported) {
       return;
     }
+    // استعادة فترة التهدئة بعد إعادة تشغيل التطبيق.
+    final int? lastShownMillis = ref
+        .read(preferencesServiceProvider)
+        .getInt(PrefKeys.appOpenAdLastShown);
+    _lastShownAt = lastShownMillis == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(lastShownMillis);
     _lifecycleListener = AppLifecycleListener(
       onResume: _onResumed,
     );
@@ -36,8 +46,9 @@ class AppOpenAdController extends Notifier<void> {
       !Platform.environment.containsKey('FLUTTER_TEST') && Platform.isAndroid;
 
   Future<void> _onResumed() async {
-    final bool enabled = ref.read(adConfigProvider).appOpenEnabled;
-    if (!enabled || _isShowing) {
+    final AdConfig config = ref.read(adConfigProvider);
+    final bool enabled = config.enabled && config.appOpenEnabled;
+    if (!enabled || _isShowing || !AdService.isReady) {
       return;
     }
     if (_lastShownAt != null &&
@@ -82,6 +93,12 @@ class AppOpenAdController extends Notifier<void> {
         _appOpenAd = null;
         _isShowing = false;
         _lastShownAt = DateTime.now();
+        unawaited(
+          ref.read(preferencesServiceProvider).setInt(
+                PrefKeys.appOpenAdLastShown,
+                _lastShownAt!.millisecondsSinceEpoch,
+              ),
+        );
       },
       onAdFailedToShowFullScreenContent: (AppOpenAd shownAd, AdError _) {
         shownAd.dispose();

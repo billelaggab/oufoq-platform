@@ -30,12 +30,6 @@ abstract final class EnvConfig {
     defaultValue: 'https://oufoq.com/privacy-policy',
   );
 
-  /// رابط صفحة "من نحن".
-  static const String aboutUrl = String.fromEnvironment(
-    'ABOUT_URL',
-    defaultValue: 'https://oufoq.com/about-us',
-  );
-
   /// معرّف قسم الأخبار العاجلة في ووردبريس (يُضبط من إضافة الجسر إن وُجدت).
   static const int fallbackBreakingCategoryId = int.fromEnvironment(
     'BREAKING_CATEGORY_ID',

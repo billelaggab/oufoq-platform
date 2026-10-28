@@ -34,10 +34,12 @@ abstract final class AdUnitIds {
     if (_shouldSkip) {
       return '';
     }
-    if (!kReleaseMode || prodId.isEmpty) {
-      return testId;
+    // في الإصدار لا نستخدم معرّفات الاختبار أبداً؛ عند غياب معرّف الإنتاج
+    // نُعطّل الوحدة بدل شحن إعلانات تجريبية.
+    if (kReleaseMode) {
+      return prodId;
     }
-    return prodId;
+    return testId;
   }
 
   static String get banner =>

@@ -127,6 +127,91 @@ void main() {
       expect(model.htmlContent.contains('<script>'), isFalse);
     });
 
+    test('يفضّل date_gmt/modified_gmt ويعاملهما كتوقيت UTC', () {
+      final Map<String, dynamic> json = <String, dynamic>{
+        'id': 505,
+        'slug': 'gmt-dates',
+        'link': 'https://example.com/gmt-dates',
+        'date': '2026-10-27T11:30:00',
+        'date_gmt': '2026-10-27T08:30:00',
+        'modified': '2026-10-27T12:00:00',
+        'modified_gmt': '2026-10-27T09:00:00',
+        'title': <String, dynamic>{'rendered': 'تواريخ'},
+        'excerpt': <String, dynamic>{'rendered': ''},
+        'content': <String, dynamic>{'rendered': '<p>نص</p>'},
+      };
+
+      final ArticleModel model = ArticleModel.fromJson(json);
+
+      expect(model.publishedAt, DateTime.utc(2026, 10, 27, 8, 30));
+      expect(model.publishedAt?.isUtc, isTrue);
+      expect(model.modifiedAt, DateTime.utc(2026, 10, 27, 9));
+    });
+
+    test('يعود إلى date/modified عند غياب حقول GMT', () {
+      final Map<String, dynamic> json = <String, dynamic>{
+        'id': 606,
+        'slug': 'local-dates',
+        'link': 'https://example.com/local-dates',
+        'date': '2026-10-27T11:30:00',
+        'modified': '2026-10-27T12:00:00',
+        'title': <String, dynamic>{'rendered': 'تواريخ محلية'},
+        'excerpt': <String, dynamic>{'rendered': ''},
+        'content': <String, dynamic>{'rendered': '<p>نص</p>'},
+      };
+
+      final ArticleModel model = ArticleModel.fromJson(json);
+
+      expect(model.publishedAt, DateTime(2026, 10, 27, 11, 30));
+      expect(model.modifiedAt, DateTime(2026, 10, 27, 12));
+    });
+
+    test('يتجاهل روابط الصورة المساوية لـ "false" أو الفارغة', () {
+      final Map<String, dynamic> json = <String, dynamic>{
+        'id': 707,
+        'slug': 'false-image',
+        'link': 'https://example.com/false-image',
+        'title': <String, dynamic>{'rendered': 'صورة ملغاة'},
+        'excerpt': <String, dynamic>{'rendered': ''},
+        'content': <String, dynamic>{'rendered': '<p>نص</p>'},
+        // جسر ووردبريس قد يعيد false بدل رابط الصورة.
+        'oufoq_featured_image': <String, dynamic>{
+          'medium': 'false',
+          'full': '   ',
+        },
+      };
+
+      final ArticleModel model = ArticleModel.fromJson(json);
+
+      expect(model.featuredImageThumbUrl, isNull);
+      expect(model.featuredImageFullUrl, isNull);
+      expect(model.hasFeaturedImage, isFalse);
+    });
+
+    test('يتحمل media_details بقيمة null دون رمي استثناء', () {
+      final Map<String, dynamic> json = <String, dynamic>{
+        'id': 808,
+        'slug': 'null-media-details',
+        'link': 'https://example.com/null-media-details',
+        'title': <String, dynamic>{'rendered': 'بدون تفاصيل'},
+        'excerpt': <String, dynamic>{'rendered': ''},
+        'content': <String, dynamic>{'rendered': '<p>نص</p>'},
+        '_embedded': <String, dynamic>{
+          'wp:featuredmedia': <dynamic>[
+            <String, dynamic>{
+              'source_url': 'https://example.com/direct.jpg',
+              'media_details': null,
+            }
+          ],
+        },
+      };
+
+      final ArticleModel model = ArticleModel.fromJson(json);
+
+      expect(model.featuredImageThumbUrl, 'https://example.com/direct.jpg');
+      expect(model.featuredImageFullUrl, 'https://example.com/direct.jpg');
+    });
+
     test('يتحمل حقولاً ناقصة وأنواعاً غير متوقعة دون رمي استثناء', () {
       final Map<String, dynamic> json = <String, dynamic>{
         'id': '404',

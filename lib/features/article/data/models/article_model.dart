@@ -25,8 +25,12 @@ class ArticleModel extends ArticleEntity {
 
   factory ArticleModel.fromJson(Map<String, dynamic> json) {
     final String rawContent = _renderedField(json['content']);
-    final DateTime? published = DateTime.tryParse(json['date']?.toString() ?? '');
-    final DateTime? modified = DateTime.tryParse(json['modified']?.toString() ?? '');
+    // `date_gmt` هو التوقيت العالمي الموثوق؛ `date` توقيت الموقع بلا إزاحة.
+    final DateTime? published =
+        _parseDate(json['date_gmt'], isUtc: true) ?? _parseDate(json['date']);
+    final DateTime? modified =
+        _parseDate(json['modified_gmt'], isUtc: true) ??
+            _parseDate(json['modified']);
 
     final _ImagePair? images = _extractImages(json);
 
@@ -57,6 +61,30 @@ class ArticleModel extends ArticleEntity {
     return '';
   }
 
+  /// تحليل التاريخ مع دعم `date_gmt` (UTC) و`date` (توقيت الموقع).
+  static DateTime? _parseDate(dynamic value, {bool isUtc = false}) {
+    if (value is! String || value.trim().isEmpty) {
+      return null;
+    }
+    final String raw = value.trim();
+    // حقول `*_gmt` تصل بلا لاحقة Z من ووردبريس.
+    final bool hasZone = raw.endsWith('Z') ||
+        RegExp(r'[+-]\d{2}:?\d{2}$').hasMatch(raw);
+    return DateTime.tryParse(isUtc && !hasZone ? '${raw}Z' : raw);
+  }
+
+  /// يعيد رابطاً صالحاً فقط، ويتعامل مع `false` التي قد يعيدها جسر ووردبريس.
+  static String? _safeUrl(dynamic value) {
+    if (value is! String) {
+      return null;
+    }
+    final String url = value.trim();
+    if (url.isEmpty || url.toLowerCase() == 'false') {
+      return null;
+    }
+    return url;
+  }
+
   static int? _safeInt(dynamic value) {
     if (value is int) {
       return value;
@@ -82,8 +110,8 @@ class ArticleModel extends ArticleEntity {
     // 1) الحقل المخصص من إضافة Oufoq Bridge إن وُجد.
     final dynamic custom = json['oufoq_featured_image'];
     if (custom is Map) {
-      final String? medium = custom['medium']?.toString();
-      final String? full = custom['full']?.toString();
+      final String? medium = _safeUrl(custom['medium']);
+      final String? full = _safeUrl(custom['full']);
       if (medium != null || full != null) {
         return _ImagePair(medium ?? full, full ?? medium);
       }
@@ -107,12 +135,12 @@ class ArticleModel extends ArticleEntity {
       return null;
     }
 
-    final dynamic sizes = (media['media_details'] as Map?)?['sizes'];
+    final dynamic mediaDetails = media['media_details'];
+    final dynamic sizes = mediaDetails is Map ? mediaDetails['sizes'] : null;
 
     String? sizeUrl(String sizeName) {
       if (sizes is Map && sizes[sizeName] is Map) {
-        final dynamic url = (sizes[sizeName] as Map)['source_url'];
-        return url?.toString();
+        return _safeUrl((sizes[sizeName] as Map)['source_url']);
       }
       return null;
     }
@@ -120,9 +148,9 @@ class ArticleModel extends ArticleEntity {
     final String? thumb = sizeUrl('medium_large') ??
         sizeUrl('large') ??
         sizeUrl('full') ??
-        media['source_url']?.toString();
+        _safeUrl(media['source_url']);
     final String? full =
-        sizeUrl('full') ?? media['source_url']?.toString() ?? thumb;
+        sizeUrl('full') ?? _safeUrl(media['source_url']) ?? thumb;
 
     if (thumb == null && full == null) {
       return null;

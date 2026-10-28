@@ -35,11 +35,16 @@ class _FakeNewsRepository implements NewsRepository {
       );
 
   @override
-  Future<Result<List<ArticleEntity>>> getBreakingNews({int? categoryId}) async =>
+  Future<Result<List<ArticleEntity>>> getBreakingNews({
+    int? categoryId,
+    bool forceRefresh = false,
+  }) async =>
       const Ok<List<ArticleEntity>>(<ArticleEntity>[]);
 
   @override
-  Future<Result<List<ArticleEntity>>> getFeaturedPosts() async =>
+  Future<Result<List<ArticleEntity>>> getFeaturedPosts({
+    bool forceRefresh = false,
+  }) async =>
       const Ok<List<ArticleEntity>>(<ArticleEntity>[]);
 
   @override

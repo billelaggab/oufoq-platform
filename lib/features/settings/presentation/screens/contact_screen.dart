@@ -47,8 +47,12 @@ class ContactScreen extends StatelessWidget {
               title: Text(l10n.websiteLabel),
               subtitle: const Text(EnvConfig.officialWebsite),
               trailing: const Icon(Icons.open_in_new_rounded),
-              onTap: () =>
-                  _launch(context, Uri.parse(EnvConfig.officialWebsite)),
+              onTap: () {
+                final Uri? uri = Uri.tryParse(EnvConfig.officialWebsite);
+                if (uri != null) {
+                  _launch(context, uri);
+                }
+              },
             ),
           ),
         ],
